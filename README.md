@@ -5,7 +5,7 @@
 
 Thanks first auth Sean Hickey
 
-This projoct was modified from https://github.com/headzoo/node-mogile.git,
+This project was modified from https://github.com/headzoo/node-mogile.git,
 
 mogile - A MogileFS client for node.js
 ===========================================
@@ -16,11 +16,11 @@ serve my needs, and it does.
 
 ## Installation
 
-	npm install mogile
+	npm install mogilefs-ng
 
 ## Usage
 
-	var mogile = require('mogile');
+	var mogile = require('mogilefs-ng');
 	
 	// The createClient method takes an array of trackers
 	var trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];
@@ -102,7 +102,7 @@ serve my needs, and it does.
 
 ## Using Transactions
 
-	var mogile = require('mogile');
+	var mogile = require('mogilefs-ng');
 	var trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];
 	var client = mogile.createClient(trackers);
 	
@@ -144,7 +144,7 @@ serve my needs, and it does.
 
 (The MIT License)
 
-Copyright (c) 2011 Sean Hickey <headz@headzoo.org>
+Copyright (c) 2017 N3xt 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
