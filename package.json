@@ -1,0 +1,18 @@
+{
+  "name": "mogilefs-ng",
+  "version": "1.0.1",
+  "description": "mogilefs client library",
+  "main": "./index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sean2755/MogileFS-ng.git"
+  },
+  "author": "Sean",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sean2755/MogileFS-ng/issues"
+  }
+}
