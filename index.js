@@ -14,6 +14,8 @@ var	domain = require('./lib/domain'),
  */
 var Mogile = function(trackers, retries)
 {
+	//default set trackers 127.0.0.1:7001 
+	trackers = trackers || ['127.0.0.1:7001'];	
 	// A log of all commands that took place during a transaction
 	this.transaction_log = [];
 	
@@ -291,7 +293,7 @@ Mogile.prototype.sendCommand = function(cmd, callback)
 		$this.current_tracker = trackers[i];
 		var connection = net.createConnection($this.current_tracker.getPort(), $this.current_tracker.getHost());
 		connection.setEncoding($this.encoding);
-		connection.on('error', function(e) {
+		connection.on('error', function(err) {
 			i++;
 			if (i == $this.trackers.length) {
 				callback(err);
