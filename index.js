@@ -260,7 +260,7 @@ Mogile.prototype.send = function(domain, cmd, args, callback)
 			if (!args.temp_file) {
 				return callback('Unable to create temp file in /tmp');
 			}
-			$this.domain(args.domain)
+			/*$this.domain(args.domain)
 				.getFile(args.key, args.temp_file, function(err, bytes) {
 					if (err) {
 						return callback(err);
@@ -269,6 +269,10 @@ Mogile.prototype.send = function(domain, cmd, args, callback)
 					$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
 					sendf();
 				});
+			*/	
+			$this.transaction_files.push(args.temp_file);
+			$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
+			sendf();	
 		} else {
 			$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
 			sendf();
