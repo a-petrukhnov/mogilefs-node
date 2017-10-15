@@ -270,7 +270,7 @@ Mogile.prototype.send = function(domain, cmd, args, callback)
 					sendf();
 				});
 			*/	
-			$this.transaction_files.push(args.temp_file);
+			//$this.transaction_files.push(args.temp_file);
 			$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
 			sendf();	
 		} else {
