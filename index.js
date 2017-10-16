@@ -256,11 +256,11 @@ Mogile.prototype.send = function(domain, cmd, args, callback)
 			if (typeof args.class == 'undefined') {
 				return callback("A class name must be specified when deleting within a transaction");
 			}
-			args.temp_file = utils.tempnam('/tmp', 'mogile');
+			/*args.temp_file = utils.tempnam('/tmp', 'mogile');
 			if (!args.temp_file) {
 				return callback('Unable to create temp file in /tmp');
 			}
-			/*$this.domain(args.domain)
+			$this.domain(args.domain)
 				.getFile(args.key, args.temp_file, function(err, bytes) {
 					if (err) {
 						return callback(err);
@@ -269,8 +269,9 @@ Mogile.prototype.send = function(domain, cmd, args, callback)
 					$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
 					sendf();
 				});
-			*/	
-			//$this.transaction_files.push(args.temp_file);
+				
+			$this.transaction_files.push(args.temp_file);
+			*/
 			$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
 			sendf();	
 		} else {
