@@ -198,6 +198,47 @@ Mogile.prototype.getDomains = function(callback)
 }
 
 /**
+ * Create domain 
+ *
+ * @param {String} d_name  domain name
+ * @return {Boolean}
+ */
+
+Mogile.prototype.createDomain = function( d_name, callback){
+    callback = callback || noop;
+    d_name = d_name || null;
+
+    var args = null
+    this.send(d_name, 'CREATE_DOMAIN', null, function(err,response) {
+        if(err){
+            return callback(err);
+        }
+        callback();
+    })
+}
+
+
+/**
+ * delete domain 
+ *
+ * @param {String} d_name  domain name
+ * @return {Boolean}
+ */
+
+Mogile.prototype.deleteDomain = function( d_name,callback){
+    callback = callback || noop;
+    d_name = d_name || null;
+    
+    this.send(d_name, 'DELETE_DOMAIN', null, function(err,response) {
+                if(err){
+                        return callback(err);
+                }
+                callback();
+        })
+}
+
+
+/**
  * Sends a command to mogile
  *
  * @param {String} domain The storage domain
