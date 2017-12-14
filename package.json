@@ -1,6 +1,6 @@
 {
   "name": "mogilefs-ng",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "mogilefs client library",
   "main": "./index.js",
   "scripts": {
