@@ -358,7 +358,8 @@ Mogile.prototype.sendCommand = function(cmd, callback)
 		connection.setTimeout(900000);
 		connection.on('timeout',() => {
 				connection.end();
-				sendf();
+				process.exit(0)
+
 		})
 	}
 	
