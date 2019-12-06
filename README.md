@@ -37,13 +37,13 @@ The main difference is Promises usage
 		.catch(error => {});
 	
 	// Getting the contents of a file, and storing it locally in /tmp/my_file.txt
-	domain.getFile('my_file.txt', '/tmp/my_file.txt')
+	domain.get('my_file.txt', '/tmp/my_file.txt')
 		.then(bytes => {})
 		.catch(error => {});
 	
 	// Storing the file /tmp/my_file.txt in mogile using the key 'my_file.txt' in
 	// the 'default' storage class.
-	domain.storeFile('my_file.txt', 'default', '/tmp/my_file.txt')
+	domain.save('my_file.txt', 'default', '/tmp/my_file.txt')
 		.then(bytes_written => {})
 		.catch(error => {});
 	
