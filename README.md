@@ -3,24 +3,21 @@
 
 ##=======================================
 
-Thanks first auth Sean Hickey
+This project was modified from:
 
-This project was modified from https://github.com/headzoo/node-mogile.git,
+https://github.com/headzoo/node-mogile.git,
+https://github.com/Sean2755/MogileFS-ng
 
-mogile - A MogileFS client for node.js
+The main difference is Promises usage 
 ===========================================
-
-This is a simple MogileFS client for node.js. This is my first real project using
-node.js, so it may be buggy, inefficient, and just plain useless. It was written to
-serve my needs, and it does.
 
 ## Installation
 
-	npm install mogilefs-ng
+	npm install mogilefs-node
 
 ## Usage
 
-	var mogile = require('mogilefs-ng');
+	var mogile = require('mogilefs-node');
 	
 	// The createClient method takes an array of trackers
 	var trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];

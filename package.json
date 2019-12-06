@@ -1,18 +1,16 @@
 {
-  "name": "mogilefs-ng",
-  "version": "1.0.11",
+  "name": "mogilefs-node",
+  "version": "1.0.0",
   "description": "mogilefs client library",
   "main": "./index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Sean2755/MogileFS-ng.git"
+    "url": "git@github.com:a-petrukhnov/mogilefs-node.git"
   },
-  "author": "Sean",
+  "author": "Artem Petrukhnov",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Sean2755/MogileFS-ng/issues"
+    "url": "https://github.com/a-petrukhnov/mogilefs-node/issues"
   }
 }

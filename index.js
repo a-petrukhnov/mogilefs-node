@@ -1,10 +1,11 @@
-var	domain = require('./lib/domain'),
-	tracker = require('./lib/tracker'),
-	utils = require('./lib/utils'),
-	querystring = require('querystring'),
-	net = require('net'),
-	fs = require('fs'),
-	noop = function() {};
+const querystring = require('querystring');
+const net = require('net');
+const fs = require('fs')
+
+const domain = require('./lib/domain');
+const tracker = require('./lib/tracker');
+const utils = require('./lib/utils');
+const noop = () => {};
 
 /**
  * Constructor
@@ -12,8 +13,7 @@ var	domain = require('./lib/domain'),
  * @param {Array} trackers An array of mogile trackers
  * @param {Number} retries Number of times to retry an operation
  */
-var Mogile = function(trackers, retries)
-{
+const Mogile = function(trackers, retries) {
 	//default set trackers 127.0.0.1:7001 
 	trackers = trackers || ['127.0.0.1:7001'];	
 	// A log of all commands that took place during a transaction
@@ -27,7 +27,7 @@ var Mogile = function(trackers, retries)
 	
 	// The tracker hosts
 	this.trackers = [];
-	for(var i = 0; i < trackers.length; i++) {
+	for (let i = 0; i < trackers.length; i++) {
 		this.trackers.push(new tracker.factory(trackers[i]));
 	}
 	
@@ -35,7 +35,7 @@ var Mogile = function(trackers, retries)
 	this.current_tracker = null;
 	
 	// The number of times to retry an operation
-	this.retries = (typeof retries != 'undefined') ? retries : 1;
+	this.retries = (typeof retries !== 'undefined') ? retries : 1;
 	
 	// The default encoding for connections
 	this.encoding = 'ascii';
@@ -50,8 +50,7 @@ var Mogile = function(trackers, retries)
  * @param {Number} retries Number of times to retry an operation
  * @return {Mogile}
  */
-Mogile.createClient = function(trackers, retries)
-{
+Mogile.createClient = function(trackers, retries) {
 	return new Mogile(trackers, retries);
 }
 
@@ -62,63 +61,60 @@ Mogile.createClient = function(trackers, retries)
  *
  * @return {Domain}
  */
-Mogile.domain = Mogile.prototype.domain = function(name)
-{
+Mogile.domain = Mogile.prototype.domain = function(name) {
 	return domain.factory(this, name);
 }
 
 /**
  * Begins a mogile transaction
  */
-Mogile.prototype.begin = function()
-{
+Mogile.prototype.begin = function() {
 	if (this.is_transaction) {
 		return false;
 	}
 	
 	this.commit();
 	this.is_transaction = true;
+
 	return true;
 }
 
 /**
  * Commits all the changes in a transaction
  */
-Mogile.prototype.commit = function()
-{
+Mogile.prototype.commit = function() {
 	this.transactionCleanFiles();
 	this.is_transaction = false;
 	this.transaction_log = [];
 	this.transaction_files = [];
+
 	return true;
 }
 
 /**
  * Rolls back all the changes made during a transaction
  */
-Mogile.prototype.rollback = function(callback)
-{
+Mogile.prototype.rollback = function(callback) {
 	callback = callback || noop;
 	
 	// We have to stop the transaction now, or else subsequent calls
 	// to send() will keep recording transaction logs.
 	this.is_transaction = false;
-	var logs = this.transaction_log.reverse();
-	var action = null;
-	var i = -1;
-	var $this = this;
+	const logs = this.transaction_log.reverse();
+	let action = null;
+	let i = -1;
 	
-	var rollbackAction = function() {
+	const rollbackAction = () => {
 		if (++i >= logs.length) {
-			$this.commit();
+			this.commit();
 			return callback();
 		}
 		
 		action = logs[i];
 		switch(action.cmd) {
 			case 'DELETE':
-					$this.domain(action.domain)
-						.storeFile(action.args.key, action.args.class, action.args.temp_file, function(err, bytes) {
+					this.domain(action.domain)
+						.storeFile(action.args.key, action.args.class, action.args.temp_file, (err, bytes) => {
 							if (err) {
 								return callback(err);
 							}
@@ -126,8 +122,8 @@ Mogile.prototype.rollback = function(callback)
 						});
 				break;
 			case 'RENAME':
-					$this.domain(action.domain)
-						.rename(action.args.to_key, action.args.from_key, function(err) {
+					this.domain(action.domain)
+						.rename(action.args.to_key, action.args.from_key, (err) => {
 							if (err) {
 								return callback(err);
 							}
@@ -135,8 +131,8 @@ Mogile.prototype.rollback = function(callback)
 						});
 				break;
 			case 'CREATE_CLOSE':
-					$this.domain(action.domain)
-						.del(action.args.key, action.args.class, function(err) {
+					this.domain(action.domain)
+						.del(action.args.key, action.args.class, (err) => {
 							if (err) {
 								return callback(err);
 							}
@@ -156,9 +152,8 @@ Mogile.prototype.rollback = function(callback)
 /**
  * Deletes an temp files that were created during a transaction
  */
-Mogile.prototype.transactionCleanFiles = function()
-{
-	for(var i = 0; i < this.transaction_files; i++) {
+Mogile.prototype.transactionCleanFiles = function() {
+	for (let i = 0; i < this.transaction_files; i++) {
 		fs.unlink(this.transaction_files[i]);
 	}
 }
@@ -169,22 +164,24 @@ Mogile.prototype.transactionCleanFiles = function()
  * @param {Function} callback Function to call with an array of all domains
  * @return {Boolean}
  */
-Mogile.prototype.getDomains = function(callback)
-{
+Mogile.prototype.getDomains = function(callback) {
 	callback = callback || noop;
 	
-	this.send('default', 'GET_DOMAINS', {}, function(err, results) {
+	this.send('default', 'GET_DOMAINS', {}, (err, results) => {
 		if (err) {
 			return callback(err);
 		}
 		
-		var domains = [];
-		for(var i = 1; i <= results['domains']; i++) {
-			var dom = 'domain' + i;
-			var classes = {};
-			for(var j = 1; j <= results[dom + 'classes']; j++) {
-				classes[results[dom + 'class' + j + 'name']] = results[dom + 'class' + j + 'mindevcount'] - 0;
+		const domains = [];
+
+		for (let i = 1; i <= results['domains']; i++) {
+			const dom = 'domain' + i;
+			const classes = {};
+
+			for (let j = 1; j <= results[dom + 'classes']; j++) {
+				classes[results[`${dom}class${j}name`]] = results[`${dom}class${j}mindevcount`] - 0;
 			}
+
 			domains.push({
 				name: results[dom],
 				classes: classes
@@ -204,17 +201,16 @@ Mogile.prototype.getDomains = function(callback)
  * @return {Boolean}
  */
 
-Mogile.prototype.createDomain = function( d_name, callback){
+Mogile.prototype.createDomain = function(d_name, callback) {
     callback = callback || noop;
     d_name = d_name || null;
 
-    var args = null
-    this.send(d_name, 'CREATE_DOMAIN', null, function(err,response) {
-        if(err){
+    this.send(d_name, 'CREATE_DOMAIN', null, (err, response) => {
+        if (err) {
             return callback(err);
         }
         callback();
-    })
+    });
 }
 
 
@@ -225,16 +221,16 @@ Mogile.prototype.createDomain = function( d_name, callback){
  * @return {Boolean}
  */
 
-Mogile.prototype.deleteDomain = function( d_name,callback){
+Mogile.prototype.deleteDomain = function(d_name, callback) {
     callback = callback || noop;
     d_name = d_name || null;
     
-    this.send(d_name, 'DELETE_DOMAIN', null, function(err,response) {
-                if(err){
-                        return callback(err);
-                }
-                callback();
-        })
+    this.send(d_name, 'DELETE_DOMAIN', null, (err, response) => {
+		if (err) {
+	        return callback(err);
+		}
+		callback();
+    })
 }
 
 
@@ -247,124 +243,109 @@ Mogile.prototype.deleteDomain = function( d_name,callback){
  * @param {Function} callback Function to call when the operation is complete
  * @return {Boolean}
  */
-Mogile.prototype.send = function(domain, cmd, args, callback)
-{
+Mogile.prototype.send = function(domain, cmd, args, callback) {
 	args = args || {};
 	callback = callback || noop;
 	args.domain = domain;
-	var command = cmd + ' ' + querystring.stringify(args) + "\n";
-	var tries = 0;
-	var $this = this;
+	const command = `${cmd} ${querystring.stringify(args)}\n`;
+	let tries = 0;
 	
-	var sendf = function() {
-		$this.sendCommand(command, function(err, results) {
+	const sendf = () => {
+		this.sendCommand(command, (err, results) => {
 			if (err) {
-				if (++tries > $this.retries) {
+				if (++tries > this.retries) {
 					// Mark the tracker dead
 					return callback(err);
 				} else {
 					return sendf();
 				}
+			} else {
+				// All responses should start with OK or ERR, followed by a space, and then some kind
+				// of message. The message will be formatted as a URL query string, without any spaces.
+				const parts = results.split(' ');
+				
+				// Having fewer than 2 parts is some kind of communications error, since the tracker
+				// will always return 2 string separated by a space.
+				if (parts.length !== 2) {
+					return callback(`Got invalid response from tracker: ${results}`);
+				}
+				
+				// Responses starting with ERR are errors returned by the tracker. For instance
+				// if the key is unknown.
+				if (parts[0] === 'ERR') {
+					return callback(parts[1]);
+				}
+				
+				return callback(null, querystring.parse(parts[1].replace('\r\n', '')));
 			}
-			
-			// All responses should start with OK or ERR, followed by a space, and then some kind
-			// of message. The message will be formatted as a URL query string, without any spaces.
-			var parts = results.split(' ');
-			
-			// Having fewer than 2 parts is some kind of communications error, since the tracker
-			// will always return 2 string separated by a space.
-			if (parts.length != 2) {
-				return callback('Got invalid response from tracker: ' + results);
-			}
-			
-			// Responses starting with ERR are errors returned by the tracker. For instance
-			// if the key is unknown.
-			if (parts[0] == 'ERR') {
-				return callback(parts[1]);
-			}
-			
-			return callback(null, querystring.parse(parts[1].replace("\r\n", "")));
 		});
 	}
 	
 	if (this.is_transaction) {
-		if (cmd == 'DELETE') {
+		if (cmd === 'DELETE') {
 			// When deleting, we need to store a temp copy of the file. That way
 			// we can re-store the file if the transaction is rolled back. That's
 			// why we *need* a storage class for the delete command when inside
 			// transactions... There's no way to re-store the file without the name
 			// of the storage class.
-			if (typeof args.class == 'undefined') {
-				return callback("A class name must be specified when deleting within a transaction");
+			if (typeof args.class === 'undefined') {
+				return callback('A class name must be specified when deleting within a transaction');
 			}
-			/*args.temp_file = utils.tempnam('/tmp', 'mogile');
-			if (!args.temp_file) {
-				return callback('Unable to create temp file in /tmp');
-			}
-			$this.domain(args.domain)
-				.getFile(args.key, args.temp_file, function(err, bytes) {
-					if (err) {
-						return callback(err);
-					}
-					$this.transaction_files.push(args.temp_file);
-					$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
-					sendf();
-				});
-				
-			$this.transaction_files.push(args.temp_file);
-			*/
-			$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
+
+			this.transaction_log.push({domain, cmd, args});
 			sendf();	
 		} else {
-			$this.transaction_log.push({"domain": domain, "cmd": cmd, "args": args });
+			this.transaction_log.push({domain, cmd, args});
 			sendf();
 		}
 	} else {
 		sendf();
 	}
-
-	return true;
 }
 
-Mogile.prototype.sendCommand = function(cmd, callback)
-{
-	var trackers = this.getLiveTrackers();
-	if (trackers.length == 0) {
+Mogile.prototype.sendCommand = function(cmd, callback) {
+	const trackers = this.getLiveTrackers();
+	callback = callback || noop;
+
+	if (!trackers.length) {
 		callback('No live trackers found');
 	}
 	
-	var i = 0;
-	var $this = this;
-	var sendf = function() {
-		$this.current_tracker = trackers[i];
-		var connection = net.createConnection($this.current_tracker.getPort(), $this.current_tracker.getHost());
-		connection.setEncoding($this.encoding);
-		connection.on('error', function(err) {
+	let i = 0;
+
+	const sendf = () => {
+		this.current_tracker = trackers[i];
+		const connection = net.createConnection(this.current_tracker.getPort(), this.current_tracker.getHost());
+
+		connection.setEncoding(this.encoding);
+
+		connection.on('error', (err) => {
 			i++;
-			if (i == $this.trackers.length) {
+			if (i === this.trackers.length) {
 				callback(err);
 			} else {
 				sendf();
 			}
 		});
-		connection.on('connect', function() {
-			connection.write(cmd, $this.encoding, function() {
-				connection.on('data', function(response) {
+
+		connection.on('connect', () => {
+			connection.write(cmd, this.encoding, () => {
+				connection.on('data', (response) => {
 					connection.end();
 					callback(null, response);
 				});
 			});
 		});
-		connection.setTimeout(900000);
-		connection.on('timeout',() => {
-				connection.end();
-				process.exit(0)
 
-		})
+		connection.setTimeout(900000);
+
+		connection.on('timeout', () => {
+			connection.end();
+			process.exit(0);
+		});
 	}
 	
 	sendf();
-	return true;
 }
 
 /**
@@ -372,14 +353,15 @@ Mogile.prototype.sendCommand = function(cmd, callback)
  *
  * @return {Array}
  */
-Mogile.prototype.getLiveTrackers = function()
-{
-	var live_trackers = [];
-	for(var i = 0; i < this.trackers.length; i++) {
+Mogile.prototype.getLiveTrackers = function() {
+	const live_trackers = [];
+
+	for (let i = 0; i < this.trackers.length; i++) {
 		if (this.trackers[i].isAlive()) {
 			live_trackers.push(this.trackers[i]);
 		}
 	}
+
 	return live_trackers;
 }
 
