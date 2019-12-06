@@ -16,125 +16,81 @@ The main difference is Promises usage
 	npm install mogilefs-node
 
 ## Usage
-
-	var mogile = require('mogilefs-node');
+	
+	const mogile = require('mogilefs-node');
 	
 	// The createClient method takes an array of trackers
-	var trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];
+	const trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];
 	
 	// Create a new mogile client
-	var client = mogile.createClient(trackers);
+	const client = mogile.createClient(trackers);
 	
 	// Get all the domains
 	client.getDomains(function(err, domains) {
 		if (err) {
 			console.log('ERROR: ' + err);
-			return;
 		}
 		console.log(domains);
 	});
 	
 	// All of the commands that work within a domain use a Domain object
-	var domain = client.domain('default');
+	const domain = client.domain('default');
 	
 	// Get all the paths for a given file
-	domain.getPaths('my_file.txt', 0, function(err, paths) {
-		if (err) {
-			console.log('ERROR: ' + err);
-			return;
-		}
-		if (paths.length == 0) {
-			console.log('No paths found for key');
-			return;
-		}
-		
-		for(var i = 0; i < paths.length; i++) {
-			console.log(paths[i]);
-		}
-	});
+	domain.getPaths('my_file.txt', 0)
+		.then(paths => {})
+		.catch(error => {});
 	
 	// Getting the contents of a file, and storing it locally in /tmp/my_file.txt
-	domain.getFile('my_file.txt', '/tmp/my_file.txt', function(err, bytes_written) {
-		if (err) {
-			console.log('ERROR: ' + err);
-			return;
-		}
-		console.log('Wrote ' + bytes_written + ' bytes');
-	});
+	domain.getFile('my_file.txt', '/tmp/my_file.txt')
+		.then(bytes_written => {})
+		.catch(error => {});
 	
 	// Storing the file /tmp/my_file.txt in mogile using the key 'my_file.txt' in
 	// the 'default' storage class.
-	domain.storeFile('my_file.txt', 'default', '/tmp/my_file.txt', function(err, bytes_written) {
-		if (err) {
-			console.log('ERROR: ' + err);
-			return;
-		}
-		console.log('Wrote ' + bytes_written + ' bytes');
-	});
+	domain.storeFile('my_file.txt', 'default', '/tmp/my_file.txt')
+		.then(bytes_written => {})
+		.catch(error => {});
 	
 	// Deleting a file
-	domain.del('my_file.txt', function(err) {
-		if (err) {
-			console.log('ERROR: ' + err);
-			return;
-		}
-	});
+	domain.del('my_file.txt')
+		.then(response => {})
+		.catch(error => {});
 	
 	// Renaming a file
-	domain.rename('my_file.txt', 'your_file.txt', function(err) {
-		if (err) {
-			console.log('ERROR: ' + err);
-			return;
-		}
-	});
+	domain.rename('my_file.txt', 'your_file.txt')
+		.then(response => {})
+		.catch(error => {});
 
 	// Search Key 
-	domain.get_keys( prefix_key, null, null , (err,response) => {
-		if (err) {
-			console.log('ERROR: ' + err);
-			return;
-		}
-		return response; 
-	}
+	domain.get_keys(prefix_key, null, null)
+		.then(response => {})
 
 ## Using Transactions
 
-	var mogile = require('mogilefs-ng');
-	var trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];
-	var client = mogile.createClient(trackers);
+	const mogile = require('mogilefs-node');
+	const trackers = ['mogtracker1.server.net:7001', 'mogtracker2.server.net:7001'];
+	const client = mogile.createClient(trackers);
 	
 	client.begin(); // Start the transaction
 	
-	var domain = client.domain('default');
-	domain.storeFile('my_file.txt', 'default', '/tmp/my_file.txt', function(err, bytes_written) {
-		if (err) {
-			console.log('ERROR: ' + err);
-			return;
-		}
-		console.log('Wrote ' + bytes_written + ' bytes');
-	});
+	const domain = client.domain('default');
+	domain.storeFile('my_file.txt', 'default', '/tmp/my_file.txt')
+		.then(bytes_written => {})
+		.catch(error => {});
 	
-	domain.rename('my_file.txt', 'your_file.txt', function(err) {
-		if (err) {
-			console.log('ERROR: ' + err);
-			client.rollback(); // Rollback the changes
+	domain.rename('my_file.txt', 'your_file.txt')
+		.then(response => {})
+		.catch(error => {
+			client.rollback();
 			return;
-		}
-	});
-	
-	domain.del('your_file.txt', 'default', function(err) {
-		if (err) {
-			console.log('ERROR: ' + err);
-			client.rollback(); // Rollback the changes
-			return;
-		}
-	});
+		});
 	
 	client.commit(); // Commit the changes
 	
 ## TODO
 
-* Try to use [sendfile](http://linux.die.net/man/2/sendfile) for getFile and storeFile
+* Check transactions because I am not shure they work properly
 
 
 ## License
