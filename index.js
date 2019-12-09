@@ -1,10 +1,8 @@
 const querystring = require('querystring')
 const net = require('net')
-const fs = require('fs')
 
 const domain = require('./lib/domain')
 const tracker = require('./lib/tracker')
-const utils = require('./lib/utils')
 const noop = () => {}
 
 /**
@@ -99,7 +97,6 @@ Mogile.prototype.getDomains = function() {
  * @return {Promise}
  */
 Mogile.prototype.createDomain = function(name) {
-  callback = callback || noop
   name = name || null
 
   return new Promise((resolve, reject) => {
@@ -110,7 +107,7 @@ Mogile.prototype.createDomain = function(name) {
         resolve(response)
       }
     })
-  });
+  })
 }
 
 /**
@@ -120,7 +117,6 @@ Mogile.prototype.createDomain = function(name) {
  * @return {Promise}
  */
 Mogile.prototype.deleteDomain = function(name) {
-  callback = callback || noop
   name = name || null
 
   return new Promise((resolve, reject) => {
@@ -131,7 +127,7 @@ Mogile.prototype.deleteDomain = function(name) {
         resolve(response)
       }
     })
-  });
+  })
 }
 
 /**
