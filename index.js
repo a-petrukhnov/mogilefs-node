@@ -163,7 +163,7 @@ Mogile.prototype.send = function(domain, cmd, args, callback) {
         // Having fewer than 2 parts is some kind of communications error, since the tracker
         // will always return 2 string separated by a space.
         if (parts.length !== 2) {
-          return callback(`Got invalid response from tracker: ${results}`)
+          return callback(new Error(`Got invalid response from tracker: ${results}`))
         }
         
         // Responses starting with ERR are errors returned by the tracker. For instance
@@ -185,7 +185,7 @@ Mogile.prototype.sendCommand = function(cmd, callback) {
   callback = callback || noop
 
   if (!trackers.length) {
-    callback('No live trackers found')
+    callback(new Error('No live trackers found'))
   }
   
   let i = 0
